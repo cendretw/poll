@@ -1,0 +1,77 @@
+<div id="workshop-pulse-embed"></div>
+
+<style>
+  #workshop-pulse-embed {
+    --wp-ink: #1d2d2a;
+    --wp-muted: #6a7773;
+    --wp-line: #e5e7e1;
+    --wp-canvas: #f1f0eb;
+    --wp-coral: #f4b39f;
+    --wp-green: #2d765e;
+    font-family: Arial, "Noto Sans TC", sans-serif;
+    color: var(--wp-ink);
+    background: var(--wp-canvas);
+    border-radius: 24px;
+    padding: 28px;
+  }
+  #workshop-pulse-embed .wp-brand { font-weight: 800; margin-bottom: 38px; }
+  #workshop-pulse-embed .wp-eyebrow { color: var(--wp-green); font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 10px; }
+  #workshop-pulse-embed h1 { font-size: clamp(30px, 5vw, 54px); line-height: 1.15; letter-spacing: -.06em; margin: 0 0 12px; }
+  #workshop-pulse-embed h3 { margin: 0 0 5px; font-size: 16px; }
+  #workshop-pulse-embed p { color: var(--wp-muted); font-size: 13px; line-height: 1.7; }
+  #workshop-pulse-embed .wp-card { background: #fff; border: 1px solid var(--wp-line); border-radius: 20px; padding: 24px; margin-top: 24px; }
+  #workshop-pulse-embed .wp-heading { display: flex; justify-content: space-between; gap: 14px; align-items: start; margin-bottom: 22px; }
+  #workshop-pulse-embed .wp-tag { border-radius: 999px; padding: 6px 10px; background: #e2f4e8; color: var(--wp-green); font-size: 11px; font-weight: 800; white-space: nowrap; }
+  #workshop-pulse-embed .wp-scores { display: grid; gap: 18px; }
+  #workshop-pulse-embed .wp-score { display: grid; grid-template-columns: 190px 1fr 42px; gap: 14px; align-items: center; }
+  #workshop-pulse-embed .wp-label { font-size: 13px; font-weight: 700; }
+  #workshop-pulse-embed .wp-track { height: 15px; border-radius: 20px; background: #edf0eb; overflow: hidden; }
+  #workshop-pulse-embed .wp-fill { height: 100%; border-radius: inherit; background: var(--wp-coral); }
+  #workshop-pulse-embed .wp-number { text-align: right; font-size: 18px; font-weight: 800; }
+  #workshop-pulse-embed .wp-share-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  #workshop-pulse-embed .wp-share { background: #f6f8f3; border-radius: 14px; padding: 16px; color: #485752; font-size: 13px; line-height: 1.7; }
+  #workshop-pulse-embed .wp-share::before { content: "“"; color: var(--wp-green); font-size: 28px; font-weight: 800; vertical-align: -7px; margin-right: 3px; }
+  #workshop-pulse-embed .wp-note { font-size: 11px; margin-top: 22px; }
+  @media (max-width: 650px) { #workshop-pulse-embed { padding: 20px; } #workshop-pulse-embed .wp-score { grid-template-columns: 1fr 2fr 36px; gap: 8px; } #workshop-pulse-embed .wp-share-grid { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+(() => {
+  const API_URL = "https://script.google.com/macros/s/AKfycbwX6i_AmZISS6HeRH2ohr2XMwthNYUov6qS4nGbx2rk_e437Yj3L9rIPp7jj79LBEEM/exec";
+  const SESSION_ID = "ai-teacher-workshop";
+  const root = document.getElementById("workshop-pulse-embed");
+  const labels = ["我有信心開始嘗試", "我能連結到課堂需求", "我知道下一步怎麼做"];
+  const callbackName = `workshopPulseEmbed_${Date.now()}`;
+
+  root.innerHTML = `<p>正在讀取本場研習回饋…</p>`;
+
+  window[callbackName] = payload => {
+    delete window[callbackName];
+    const scores = Array.isArray(payload.scores) ? payload.scores : [null, null, null];
+    const shares = Array.isArray(payload.approvedShares) ? payload.approvedShares : [];
+    const valid = scores.filter(score => Number(score) > 0);
+    const average = valid.length ? (valid.reduce((sum, score) => sum + Number(score), 0) / valid.length).toFixed(1) : "尚無回覆";
+
+    root.innerHTML = `
+      <div class="wp-brand">Workshop Pulse｜研習回饋</div>
+      <div class="wp-eyebrow">Session reflection</div>
+      <h1>AI 教師研習</h1>
+      <p>這是本場研習的回饋摘要，謝謝你一起留下教學現場的觀察。</p>
+      <section class="wp-card">
+        <div class="wp-heading"><div><h3>今天的三項信心平均</h3><p>來自本場 post-test 的匿名彙整結果</p></div><span class="wp-tag">${payload.responseCount || 0} 份回覆</span></div>
+        <div class="wp-scores">${scores.map((score, index) => `<div class="wp-score"><div class="wp-label">${labels[index]}</div><div class="wp-track"><div class="wp-fill" style="width:${Number(score) > 0 ? Number(score) / 5 * 100 : 0}%"></div></div><div class="wp-number">${Number(score) > 0 ? Number(score).toFixed(1) : "—"}</div></div>`).join("")}</div>
+        <p class="wp-note">平均 ${average}　　1 = 非常沒有信心　　5 = 非常有信心</p>
+      </section>
+      <section class="wp-card">
+        <div class="wp-heading"><div><h3>老師們的文字分享</h3><p>以下內容已經過管理者審核</p></div></div>
+        <div class="wp-share-grid">${shares.length ? shares.map(text => `<div class="wp-share">${text}</div>`).join("") : "<p>本場目前還沒有公開的文字分享。</p>"}</div>
+        <p class="wp-note">本頁只顯示本場 post-test 的彙整結果與已審核分享，不包含個人資料、前測答案或其他場次紀錄。</p>
+      </section>`;
+  };
+
+  const script = document.createElement("script");
+  script.src = `${API_URL}?session=${encodeURIComponent(SESSION_ID)}&callback=${callbackName}`;
+  script.onerror = () => { delete window[callbackName]; root.innerHTML = "<p>目前無法讀取本場回饋，請稍後再試。</p>"; };
+  document.body.appendChild(script);
+})();
+</script>
