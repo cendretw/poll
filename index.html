@@ -54,18 +54,18 @@
 
     root.innerHTML = `
       <div class="wp-brand">Workshop Pulse｜研習回饋</div>
-      <div class="wp-eyebrow">Session reflection</div>
-      <h1>AI 教師研習</h1>
-      <p>這是本場研習的回饋摘要，謝謝你一起留下教學現場的觀察。</p>
+      <div class="wp-eyebrow">Pre-session reflection</div>
+      <h1>AI 教師研習｜前測回饋</h1>
+      <p>這是本場研習的前測摘要，協助你了解參與老師在研習開始前的信心與需求。</p>
       <section class="wp-card">
-        <div class="wp-heading"><div><h3>今天的三項信心平均</h3><p>來自本場 post-test 的匿名彙整結果</p></div><span class="wp-tag">${payload.responseCount || 0} 份回覆</span></div>
+        <div class="wp-heading"><div><h3>前測三項信心平均</h3><p>來自本場 pre-test 的匿名彙整結果</p></div><span class="wp-tag">${payload.responseCount || 0} 份回覆</span></div>
         <div class="wp-scores">${scores.map((score, index) => `<div class="wp-score"><div class="wp-label">${labels[index]}</div><div class="wp-track"><div class="wp-fill" style="width:${Number(score) > 0 ? Number(score) / 5 * 100 : 0}%"></div></div><div class="wp-number">${Number(score) > 0 ? Number(score).toFixed(1) : "—"}</div></div>`).join("")}</div>
         <p class="wp-note">平均 ${average}　　1 = 非常沒有信心　　5 = 非常有信心</p>
       </section>
       <section class="wp-card">
-        <div class="wp-heading"><div><h3>老師們的文字分享</h3><p>以下內容已經過管理者審核</p></div></div>
+        <div class="wp-heading"><div><h3>課前文字分享</h3><p>以下內容已經過管理者審核</p></div></div>
         <div class="wp-share-grid">${shares.length ? shares.map(text => `<div class="wp-share">${text}</div>`).join("") : "<p>本場目前還沒有公開的文字分享。</p>"}</div>
-        <p class="wp-note">本頁只顯示本場 post-test 的彙整結果與已審核分享，不包含個人資料、前測答案或其他場次紀錄。</p>
+        <p class="wp-note">本頁只顯示本場 pre-test 的彙整結果與已審核分享，不包含個人資料、後測答案或其他場次紀錄。</p>
       </section>`;
   };
 
